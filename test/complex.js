@@ -2,7 +2,7 @@ var assert = require('assert');
 var helper = require('./lib/helper');
 
 var Queue = require('../lib/queue');
-var MemoryStore = require('better-queue-memory');
+var MemoryStore = require('../lib/memory-store');
 
 describe('Complex Queue', function() {
   afterEach(helper.destroyQueues);

@@ -1,16 +1,8 @@
-# Better Queue - Powerful flow control
+# React Native Better Queue
 
-[![npm package](https://nodei.co/npm/better-queue.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/better-queue/)
+React Native Better Queue brings the battle-tested API of [`better-queue`](https://github.com/diamondio/better-queue) to iOS and Android. It replaces Node-only internals with React Native friendly modules, ships with a SQLite-backed store, and keeps the original surface area so existing examples and integrations continue to work.
 
-[![Build status](https://img.shields.io/travis/diamondio/better-queue.svg?style=flat-square)](https://travis-ci.org/diamondio/better-queue)
-[![Dependency Status](https://img.shields.io/david/diamondio/better-queue.svg?style=flat-square)](https://david-dm.org/diamondio/better-queue)
-[![Known Vulnerabilities](https://snyk.io/test/npm/better-queue/badge.svg?style=flat-square)](https://snyk.io/test/npm/better-queue)
-[![Gitter](https://img.shields.io/badge/gitter-join_chat-blue.svg?style=flat-square)](https://gitter.im/leanderlee/better-queue?utm_source=badge)
-
-
-## Super simple to use
-
-Better Queue is designed to be simple to set up but still let you do complex things.
+## Highlights
 
 - Persistent (and extendable) storage
 - Batched processing
@@ -25,10 +17,28 @@ Better Queue is designed to be simple to set up but still let you do complex thi
 
 ---
 
-#### Install (via npm)
+#### Install (React Native projects)
+
+##### A) Minimal install (memory-only)
+
+Use this when you do **not** need persistence or native dependencies:
 
 ```bash
-npm install --save better-queue
+npm install react-native-better-queue
+```
+
+##### B) Recommended install (SQLite persistence)
+
+Enable durable queues by adding the SQLite driver as well:
+
+```bash
+npm install react-native-better-queue react-native-sqlite-storage
+```
+
+If you install `react-native-sqlite-storage`, you must link the native module for iOS projects by running:
+
+```bash
+npx pod-install
 ```
 
 ---
@@ -36,7 +46,7 @@ npm install --save better-queue
 #### Quick Example
 
 ```js
-var Queue = require('better-queue');
+var Queue = require('react-native-better-queue');
 
 var q = new Queue(function (input, cb) {
   
@@ -48,6 +58,8 @@ var q = new Queue(function (input, cb) {
 q.push(1)
 q.push({ x: 1 })
 ```
+
+> The remainder of this document mirrors the original Better Queue documentation. All examples continue to apply because the public API is unchanged.
 
 ## Table of contents
 
@@ -557,50 +569,42 @@ var stats = q.getStats();
 ## Storage
 
 
-#### Using a store
+#### Built-in stores
 
-For your convenience, we have added compatibility for a few storage options.
+React Native Better Queue ships with two stores:
 
-By default, we are using an in-memory store that doesn't persist. You can change
-to one of our other built in stores by passing in the `store` option.
+ - `memory` _(default)_ — ephemeral storage useful for tests or short lived queues
+ - `sqlite` — persistent storage powered by `react-native-sqlite-storage`
 
-#### Built-in store
+#### Memory store (default)
 
-Currently, we support the following stores:
+```
+var q = new Queue(fn);
+```
 
- - memory
- - sql (SQLite, PostgreSQL)
+This mode keeps all tasks in memory and is reset whenever the process restarts. It requires no native dependencies and is ideal for tests or simple background work that does not need persistence.
 
-#### SQLite store (`npm install sqlite3`)
+#### SQLite store (for persistence)
+
 ```
 var q = new Queue(fn, {
   store: {
-    type: 'sql',
-    dialect: 'sqlite',
-    path: '/path/to/sqlite/file'
+    type: 'sqlite',
+    database: {
+      name: 'queue.db',
+      location: 'default'
+    }
   }
 });
 ```
 
-Note that this requires `better-queue-sql` or `better-queue-sqlite`.
+The SQLite store accepts the following options:
 
-#### PostgreSQL store (`npm install pg`)
-```
-var q = new Queue(fn, {
-  store: {
-    type: 'sql',
-    dialect: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'username',
-    password: 'password',
-    dbname: 'template1',
-    tableName: 'tasks'
-  }
-});
-```
+- `database.name` – database file name (defaults to `better-queue.db`)
+- `database.location` – storage location passed to `react-native-sqlite-storage`
+- `sqlite` – supply a custom driver (handy for tests)
 
-Please help us add support for more stores; contributions are welcome!
+> Install `react-native-sqlite-storage` in your React Native app to enable persistence.
 
 #### Custom Store
 
@@ -646,12 +650,12 @@ q.use({
 ---
 ## Using with Webpack
 
-Better Queue can be used in the browser using the default in-memory store. However you have to create and pass the store to its constructor. 
+Better Queue can be used in the browser using the default in-memory store. If you prefer to manage the store instance explicitly, you can pass it to the constructor:
 
 
 ```js
-import Queue = require('better-queue')
-import MemoryStore = require('better-queue-memory')
+import Queue = require('react-native-better-queue')
+import MemoryStore = require('react-native-better-queue/lib/memory-store')
 
 var q = new Queue(function (input, cb) {
   
@@ -676,7 +680,7 @@ npm install --save @types/better-queue
 Afterwards, you can simply import the library:
 
 ```ts
-import Queue = require('better-queue')
+import Queue = require('react-native-better-queue')
 
 const q: Queue = new Queue(() => {});
 ```
@@ -753,4 +757,3 @@ A process function is required, all other options are optional.
 - `progress` - When the corresponding task progress changes
 - `finish` - When the corresponding task completes
 - `failed` - When the corresponding task fails
-

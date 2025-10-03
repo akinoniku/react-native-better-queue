@@ -1,5 +1,6 @@
 var assert = require('assert');
 var Queue = require('../lib/queue');
+var SqliteStore = require('../lib/sqlite-store');
 
 describe('Store Usage', function() {
 
@@ -86,5 +87,23 @@ describe('Store Usage', function() {
   })
 
   // TODO: Test progress
+
+  it('uses the memory store by default', function (done) {
+    var q = new Queue(function (task, cb) {
+      cb(null, task + 1);
+    });
+
+    q.push(1, function (err, result) {
+      assert.ifError(err);
+      assert.strictEqual(result, 2);
+      q.destroy(done);
+    });
+  });
+
+  it('throws if sqlite driver is missing', function () {
+    assert.throws(function () {
+      new SqliteStore({ sqlite: null });
+    }, /react-native-sqlite-storage/);
+  });
 
 })
