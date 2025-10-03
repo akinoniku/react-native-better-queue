@@ -1,6 +1,6 @@
 {
   "name": "react-native-better-queue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Persistent task queue for React Native powered by SQLite",
   "main": "lib/queue.js",
   "directories": {
