@@ -42,5 +42,6 @@
     "react-native-sqlite-storage": {
       "optional": true
     }
-  }
+  },
+  "types": "index.d.ts"
 }

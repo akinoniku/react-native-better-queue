@@ -757,3 +757,45 @@ A process function is required, all other options are optional.
 - `progress` - When the corresponding task progress changes
 - `finish` - When the corresponding task completes
 - `failed` - When the corresponding task fails
+
+
+
+### TypeScript
+
+This package ships with first-class TypeScript typings via `index.d.ts`. No extra `@types` install is needed.
+
+Basic usage in TS:
+
+```ts
+import Queue = require('react-native-better-queue');
+
+type Task = { id: string; payload: number };
+type Result = { doubled: number };
+
+const q = new Queue<Task, Result>((task, cb) => {
+  // When `batchSize > 1`, `task` will be `Task[]`.
+  if (Array.isArray(task)) {
+    // do batched work ...
+    cb(null, { doubled: task[0].payload * 2 });
+    return;
+  }
+  cb(null, { doubled: task.payload * 2 });
+}, {
+  id: 'id',
+  batchSize: 1,
+});
+
+q.on('task_finish', (taskId, result, stats) => {
+  // taskId: string, result: Result, stats.elapsed?: number
+});
+
+q.push({ id: 't1', payload: 21 }, (err, res) => {
+  // res is typed as Result
+});
+```
+
+With `esModuleInterop` enabled, you may also write:
+
+```ts
+import Queue from 'react-native-better-queue';
+```
